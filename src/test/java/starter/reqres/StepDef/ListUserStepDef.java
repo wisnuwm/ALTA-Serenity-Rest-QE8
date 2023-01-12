@@ -1,12 +1,17 @@
 package starter.reqres.StepDef;
 
+import java.io.File;
+
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.Steps;
 import starter.reqres.ReqresAPI;
+import starter.reqres.Utils.Constant;
+import starter.reqres.Utils.ReqresResponses;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -27,18 +32,29 @@ public class ListUserStepDef {
     }
 
     @Then("Should return status code {int}")
-    public void shouldReturnStatusCode(int ok) {
-        SerenityRest.then().statusCode(ok);
+    public void shouldReturnStatusCode(int statusCode) {
+        SerenityRest.then().statusCode(statusCode);
     }
 
     @And("Response body page should be {int}")
     public void responseBodyPageShouldBe(int page) {
-        SerenityRest.then().body("page",equalTo(page));
+        SerenityRest.then().body(ReqresResponses.PAGE,equalTo(page));
     }
 
+    @And("Validate json schema list user")
+    public void validateJsonSchemaListUser() {
+        File jsonSchema = new File(Constant.JSON_SCHEMA+"/ListUserSchema.json");
+        SerenityRest.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(jsonSchema));
+    }
+
+    //untuk negative case
     @Given("Get list user with page {string}")
     public void getListUserWithPage(String page) {
         reqresAPI.getListUsersInvalid(page);
     }
 
+    //    @Given("Get list user with page {string}")
+//    public void getListUserWithPage(String page) {
+//        reqresAPI.getListUsersInvalid(page);
+//    }
 }
